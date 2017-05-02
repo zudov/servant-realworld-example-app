@@ -50,6 +50,7 @@ executable servant-realworld-example-app-exe
     , wai-extra
     , warp
     , servant-server
+    , rapid
   other-modules:
       DevelMain
   default-language: Haskell2010

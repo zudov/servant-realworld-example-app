@@ -37,3 +37,4 @@ executables:
     - wai-extra
     - warp
     - servant-server
+    - rapid
