@@ -7,8 +7,10 @@ import Prelude
 import Data.Text (Text)
 import Servant
 
+import RealWorld.Monad
+
 type Api = Get '[JSON] Text
 
-server :: Server Api
+server :: ServerT Api RealWorld
 server =
-  pure "Hello realworld"
+  pure "Enter the realworld"

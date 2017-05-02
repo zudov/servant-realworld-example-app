@@ -17,11 +17,13 @@ library:
   source-dirs: src
   exposed-modules:
   - RealWorld.Api
+  - RealWorld.Monad
   dependencies:
   - base >= 4.7 && <5
   - wai
   - servant-server
   - text
+  - mtl
 executables:
   servant-realworld-example-app-exe:
     main: Main.hs
@@ -38,3 +40,4 @@ executables:
     - warp
     - servant-server
     - rapid
+    - mtl
