@@ -1,0 +1,5 @@
+resolver: lts-8.12
+packages:
+- '.'
+extra-deps:
+- rapid-0.1.3
