@@ -1,4 +1,4 @@
-name: servant-realworld-example-app
+name: realworld-app
 version: '0.1.0.0'
 category: Web
 author: Konstantin Zudov
@@ -25,7 +25,7 @@ library:
   - text
   - mtl
 executables:
-  servant-realworld-example-app-exe:
+  realworld-app-exe:
     main: Main.hs
     source-dirs: app
     ghc-options:
@@ -34,7 +34,7 @@ executables:
     - -with-rtsopts=-N
     dependencies:
     - base >= 4.7 && <5
-    - servant-realworld-example-app
+    - realworld-app
     - wai
     - wai-extra
     - warp
