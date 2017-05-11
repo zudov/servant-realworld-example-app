@@ -17,9 +17,14 @@ import qualified Rapid
 update :: IO ()
 update =
   Rapid.rapid 0 $ \r -> do
-    Rapid.start r "webserver" $ do
+    Rapid.restart r "webserver" $ do
       putStrLn "(re)starting the webserver"
       webserver
+
+stop :: IO ()
+stop =
+  Rapid.rapid 0 $ \r -> do
+    Rapid.stop r "webserver" webserver
 
 webserver :: IO ()
 webserver =
