@@ -137,7 +137,19 @@ steps:
 columns: 80
 newline: lf
 language_extensions:
-  - TypeApplications
-  - DataKinds
-  - TypeOperators
-  - NoImplicitPrelude
+- DataKinds
+- DeriveFoldable
+- DeriveFunctor
+- DeriveGeneric
+- FlexibleContexts
+- FlexibleInstances
+- GADTs
+- KindSignatures
+- NoImplicitPrelude
+- RecordWildCards
+- ScopedTypeVariables
+- StandaloneDeriving
+- TypeApplications
+- TypeFamilies
+- TypeOperators
+- MultiParamTypeClasses

@@ -9,26 +9,55 @@ github: zudov/servant-realworld-example-app
 extra-source-files:
 - README.md
 default-extensions:
-- TypeApplications
 - DataKinds
-- TypeOperators
+- DeriveFoldable
+- DeriveFunctor
+- DeriveGeneric
+- FlexibleContexts
+- FlexibleInstances
+- GADTs
+- KindSignatures
 - NoImplicitPrelude
+- RecordWildCards
+- ScopedTypeVariables
+- StandaloneDeriving
+- TypeApplications
+- TypeFamilies
+- TypeOperators
+- MultiParamTypeClasses
+
 library:
   source-dirs: src
+  ghc-options:
+    - -Wall
   exposed-modules:
   - RealWorld.Api
   - RealWorld.Monad
+  - RealWorld.Prelude
   dependencies:
   - base >= 4.7 && <5
   - wai
   - servant-server
   - text
   - mtl
+  - aeson
+  - containers
+  - unordered-containers
+  - hashable
+  - vector
+  - time
+  - http-api-data
+  - slug
+  - exceptions
+  - monad-time
+  - acid-state
+  - safecopy
 executables:
   realworld-app-exe:
     main: Main.hs
     source-dirs: app
     ghc-options:
+    - -Wall
     - -threaded
     - -rtsopts
     - -with-rtsopts=-N

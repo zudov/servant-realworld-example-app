@@ -4,10 +4,12 @@ module RealWorld.Api
 
 import Servant
 
-import RealWorld.Monad
+import qualified RealWorld.Api.Articles as Articles
+import           RealWorld.Monad
 
-type Api = Get '[JSON] Text
+type Api =
+  "articles" :> Articles.Api
 
 server :: ServerT Api RealWorld
 server =
-  pure "Enter the realworld"
+  Articles.server
