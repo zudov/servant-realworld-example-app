@@ -8,7 +8,8 @@ import Control.Monad          as A (MonadPlus(..), guard, mfilter, when)
 import Control.Monad.Catch    as A (MonadThrow(..), catch)
 import Control.Monad.Except   as A (ExceptT(..), MonadError(..), withExceptT)
 import Control.Monad.IO.Class as A (MonadIO, liftIO)
-import Control.Monad.Reader   as A (MonadReader(..), ask, asks)
+import Control.Monad.Reader   as A
+  (MonadReader(..), ReaderT, ask, asks, runReaderT)
 import Control.Monad.State    as A
   (MonadState(..), get, gets, modify, modify, put)
 import Data.Aeson             as A (FromJSON, ToJSON, parseJSON, toJSON)

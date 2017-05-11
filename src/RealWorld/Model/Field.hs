@@ -32,11 +32,9 @@ instance Applicative Field where
 
 instance Alternative Field where
   empty = Undefined
-  Value a   <|> _         = Value a
-  Nil       <|> Value b   = Value b
-  Nil       <|> Undefined = Nil
-  Nil       <|> Nil       = Nil
-  Undefined <|> a         = a
+  Value a   <|> _ = Value a
+  Nil       <|> _ = Nil
+  Undefined <|> a = a
 
 instance Monad Field where
   Value a   >>= f = f a

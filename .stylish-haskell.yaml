@@ -153,3 +153,4 @@ language_extensions:
 - TypeFamilies
 - TypeOperators
 - MultiParamTypeClasses
+- FunctionalDependencies

@@ -13,6 +13,7 @@ import Servant
 
 import           Control.Monad.Time      (currentTime)
 import qualified Data.Vector             as Vector
+import qualified RealWorld.DB            as DB
 import           RealWorld.Model.Article (Article(..), Slug)
 import qualified RealWorld.Model.Article as Article
 import           RealWorld.Model.Field   (Field)
@@ -84,7 +85,9 @@ server =
   deleteArticle
 
 getArticles :: RealWorld ArticlesBody
-getArticles = pure $ ArticlesBody mempty
+getArticles = do
+  articles <- DB.query DB.GetArticles
+  pure $ ArticlesBody $ Vector.fromList articles
 
 createArticle :: ArticleBody -> RealWorld ArticleBody
 createArticle (ArticleBody a) = do
@@ -114,6 +117,7 @@ createArticle (ArticleBody a) = do
         , favoritesCount = pure 0
         , author         = Field.Undefined -- FIXME: DEFINE
         }
+  _ <- DB.update $ DB.UpsertArticle slug_ article
   pure $ ArticleBody article
 
 getField
@@ -139,12 +143,29 @@ getArticle slug =
     $ notFound [ "No article with slug " <> show slug <> " found" ]
 
 updateArticle :: Slug -> ArticleBody -> RealWorld ArticleBody
-updateArticle slug _body =
-  throwError
-    $ notFound [ "No article with slug " <> show slug <> " found" ]
+updateArticle slug (ArticleBody article') = do
+  mArticle <- DB.query $ DB.GetArticle slug
+  case mArticle of
+    Nothing ->
+      throwError
+        $ notFound [ "No article with slug " <> show slug <> " found" ]
+    Just article -> do
+      let article'' = article
+            { title       = title       article' <|> title       article
+            , description = description article' <|> description article
+            , body        = body        article' <|> body        article
+            , tagList     = tagList     article' <|> tagList     article
+            }
+      DB.update $ DB.UpsertArticle slug article''
+      pure $ ArticleBody article''
 
 deleteArticle :: Slug -> RealWorld ()
-deleteArticle slug =
-  throwError
-    $ notFound [ "No article with slug " <> show slug <> " found" ]
+deleteArticle slug = do
+  mArticle <- DB.update $ DB.DeleteArticle slug
+  case mArticle of
+    Nothing ->
+      throwError
+        $ notFound [ "No article with slug " <> show slug <> " found" ]
+    Just _ ->
+      pure ()
 

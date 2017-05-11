@@ -8,25 +8,39 @@ module RealWorld.Monad
 import RealWorld.Prelude
 
 import           Control.Monad.Time (MonadTime(..))
+import           Data.Acid
 import           Data.Aeson         ((.=))
 import qualified Data.Aeson         as Json
 import           Data.Time          (getCurrentTime)
 import           Servant.Server     ((:~>)(Nat), ServantErr(..), err400, err404)
 
+import qualified RealWorld.DB as DB
+
 newtype RealWorld a
   = RealWorld
-      { unrealWorld :: ExceptT RealWorldErr IO a }
+      { unrealWorld
+          :: ReaderT (AcidState DB.Database)
+               (ExceptT RealWorldErr IO)
+               a
+      }
   deriving
     ( Functor, Applicative, Monad
     , MonadIO
     , MonadThrow, MonadError RealWorldErr
+    , MonadReader (AcidState DB.Database)
     )
 
 instance MonadTime RealWorld where
   currentTime = liftIO getCurrentTime
 
-runRealWorld :: RealWorld a -> ExceptT RealWorldErr IO a
-runRealWorld = unrealWorld
+instance DB.MonadAcid DB.Database RealWorld where
+  getAcidState = ask
+
+runRealWorld
+  :: AcidState DB.Database
+  -> RealWorld a
+  -> ExceptT RealWorldErr IO a
+runRealWorld db m = runReaderT (unrealWorld m) db
 
 newtype RealWorldErr
   = RealWorldErr { unRealWorldErr :: ServantErr }
