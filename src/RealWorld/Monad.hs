@@ -12,7 +12,7 @@ import           Data.Acid
 import           Data.Aeson         ((.=))
 import qualified Data.Aeson         as Json
 import           Data.Time          (getCurrentTime)
-import           Servant.Server     ((:~>)(Nat), ServantErr(..), err400, err404)
+import           Servant.Server     (ServantErr(..), err400, err404)
 
 import qualified RealWorld.DB as DB
 

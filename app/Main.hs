@@ -7,12 +7,12 @@ import           Data.Acid
 import qualified Network.Wai                          as Wai
 import qualified Network.Wai.Handler.Warp             as Warp
 import qualified Network.Wai.Middleware.RequestLogger as Wai
-import           Servant                              ((:~>), ServantErr)
+import           Servant                              ((:~>))
 import qualified Servant                              as Servant
 
 import RealWorld.Api   (Api, server)
 import RealWorld.DB    (Database, initialDatabase)
-import RealWorld.Monad (RealWorld, RealWorldErr(), runRealWorld, toServantErr)
+import RealWorld.Monad (RealWorld, runRealWorld, toServantErr)
 
 main :: IO ()
 main = do
