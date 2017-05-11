@@ -2,9 +2,6 @@
 module RealWorld.Api
   ( Api, server ) where
 
-import Prelude
-
-import Data.Text (Text)
 import Servant
 
 import RealWorld.Monad

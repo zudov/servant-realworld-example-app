@@ -1,15 +1,9 @@
 module DevelMain where
 
-import Prelude
+import RealWorld.Prelude
 
-import Control.Exception
-import Data.Proxy        (Proxy(..))
-
-import qualified Network.Wai                          as Wai
 import qualified Network.Wai.Handler.Warp             as Warp
 import qualified Network.Wai.Middleware.RequestLogger as Wai
-
-import qualified Servant
 
 import qualified Main
 import qualified Rapid

@@ -1,9 +1,6 @@
 module Main where
 
-import Prelude
-
-import Control.Monad.Except (ExceptT, mapExceptT, withExceptT)
-import Data.Proxy           (Proxy(..))
+import RealWorld.Prelude
 
 import qualified Network.Wai                          as Wai
 import qualified Network.Wai.Handler.Warp             as Warp
