@@ -6,40 +6,16 @@ module RealWorld.Api.Articles
 
 import RealWorld.Prelude
 
-import           Data.Aeson ((.:), (.=))
-import qualified Data.Aeson as Json
-
 import Servant
 
 import           Control.Monad.Time      (currentTime)
-import qualified Data.Vector             as Vector
 import qualified RealWorld.DB            as DB
-import           RealWorld.Model.Article (Article(..), Slug)
+import           RealWorld.Model.Article
+  (Article(..), ArticleBody(..), ArticlesBody(..), Slug)
 import qualified RealWorld.Model.Article as Article
 import           RealWorld.Model.Field   (Field)
 import qualified RealWorld.Model.Field   as Field
 import           RealWorld.Monad
-
-newtype ArticlesBody = ArticlesBody (Vector Article)
-
-instance ToJSON ArticlesBody where
-  toJSON (ArticlesBody articles) =
-    Json.object
-      [ "articles" .= articles ]
-
-newtype ArticleBody = ArticleBody Article
-  deriving (Show, Eq, Ord)
-
-instance ToJSON ArticleBody where
-  toJSON (ArticleBody article) =
-    Json.object
-      [ "article" .= article ]
-
-instance FromJSON ArticleBody where
-  parseJSON json = do
-    o <- parseJSON json
-    article <- o .: "article"
-    pure $ ArticleBody article
 
 type Api =
   GetArticles

@@ -3,6 +3,8 @@
 {-# LANGUAGE TemplateHaskell            #-}
 module RealWorld.Model.Article
   ( Article(..)
+  , ArticleBody(..)
+  , ArticlesBody(..)
   , emptyArticle
   , Slug(..)
   , sluggify
@@ -11,11 +13,12 @@ module RealWorld.Model.Article
 
 import RealWorld.Prelude
 
-import           Data.Aeson    ((.=))
+import           Data.Aeson    ((.:), (.=))
 import qualified Data.Aeson    as Json
 import qualified Data.Char     as Char
 import           Data.SafeCopy (base, deriveSafeCopy)
 import qualified Data.Text     as Text
+
 
 import           RealWorld.Model.Field   (Field)
 import qualified RealWorld.Model.Field   as Field
@@ -110,3 +113,24 @@ instance ToJSON Article where
       , "favoritesCount" .= favoritesCount
       , "author"         .= author
       ]
+
+newtype ArticlesBody = ArticlesBody [Article]
+
+instance ToJSON ArticlesBody where
+  toJSON (ArticlesBody articles) =
+    Json.object
+      [ "articles" .= articles ]
+
+newtype ArticleBody = ArticleBody Article
+  deriving (Show, Eq, Ord)
+
+instance ToJSON ArticleBody where
+  toJSON (ArticleBody article) =
+    Json.object
+      [ "article" .= article ]
+
+instance FromJSON ArticleBody where
+  parseJSON json = do
+    o <- parseJSON json
+    article <- o .: "article"
+    pure $ ArticleBody article
