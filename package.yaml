@@ -26,6 +26,8 @@ default-extensions:
 - TypeOperators
 - MultiParamTypeClasses
 - FunctionalDependencies
+- ViewPatterns
+- RankNTypes
 
 library:
   source-dirs: src
@@ -38,6 +40,7 @@ library:
   - RealWorld.DB  
   dependencies:
   - base >= 4.7 && <5
+  - bytestring
   - wai
   - servant-server
   - text
@@ -46,6 +49,7 @@ library:
   - containers
   - unordered-containers
   - hashable
+  - http-types
   - vector
   - time
   - http-api-data

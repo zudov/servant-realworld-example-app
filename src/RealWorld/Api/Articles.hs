@@ -63,22 +63,17 @@ server =
 getArticles :: RealWorld ArticlesBody
 getArticles = do
   articles <- DB.query DB.GetArticles
-  pure $ ArticlesBody $ Vector.fromList articles
+  pure $ ArticlesBody articles
 
 createArticle :: ArticleBody -> RealWorld ArticleBody
-createArticle (ArticleBody a) = do
-  -- required fields
-  title_ <- a & getField "title"       title
-  desc_  <- a & getField "description" description
-  body_  <- a & getField "body"        body
-  -- optional fields
-  let tags_ = a & getField "tagList"     tagList
-                & fold @(Either RealWorldErr)
-  -- derived and generated fields
-  slug_ <- Article.sluggify title_
-         & maybe (throwError $ unprocessable
-                   [ "Unsluggable title: " <> show title_])
-             pure
+createArticle (ArticleBody a) = ArticleBody <$> do
+  title_ <- require a "title"       title
+  desc_  <- require a "description" description
+  body_  <- require a "body"        body
+  tags_  <- require a "tagList"     tagList
+              <|> pure mempty
+  slug_  <- Article.sluggify title_
+              ?? unprocessable "Unsluggable title"
   createdAt_ <- currentTime
 
   let article = Article
@@ -93,55 +88,39 @@ createArticle (ArticleBody a) = do
         , favoritesCount = pure 0
         , author         = Field.Undefined -- FIXME: DEFINE
         }
-  _ <- DB.update $ DB.UpsertArticle slug_ article
-  pure $ ArticleBody article
+  article <$ DB.update (DB.UpsertArticle slug_ article)
 
-getField
-  :: (MonadError RealWorldErr m)
-  => Text -> (a -> Field b) -> a -> m b
-getField t f a =
-  case f a of
-    Field.Value v ->
-      pure v
-    Field.Undefined ->
-      throwError
-        $ unprocessable
-            [ "Field " <> show t <> " is undefined" ]
-    Field.Nil ->
-      throwError
-        $ unprocessable
-            [ "Field " <> show t <> " is null" ]
-
+require
+  :: (MonadError Errors m, Alternative m)
+  => a -> Text -> (a -> Field b) -> m b
+require a n f =
+  Field.toValue (f a)
+    <|> throwError
+          (unprocessable $ "Field " <> toUrlPiece n <> " is required")
 
 getArticle :: Slug -> RealWorld ArticleBody
-getArticle slug =
-  throwError
-    $ notFound [ "No article with slug " <> show slug <> " found" ]
+getArticle slug = ArticleBody <$> do
+  DB.query (DB.GetArticle slug)
+    !? articleNotFound
 
 updateArticle :: Slug -> ArticleBody -> RealWorld ArticleBody
-updateArticle slug (ArticleBody article') = do
-  mArticle <- DB.query $ DB.GetArticle slug
-  case mArticle of
-    Nothing ->
-      throwError
-        $ notFound [ "No article with slug " <> show slug <> " found" ]
-    Just article -> do
-      let article'' = article
-            { title       = title       article' <|> title       article
-            , description = description article' <|> description article
-            , body        = body        article' <|> body        article
-            , tagList     = tagList     article' <|> tagList     article
-            }
-      DB.update $ DB.UpsertArticle slug article''
-      pure $ ArticleBody article''
+updateArticle slug (ArticleBody article') = ArticleBody <$> do
+  ArticleBody article <- getArticle slug
+  let article'' = article
+        { title       = title       article' <|> title       article
+        , description = description article' <|> description article
+        , body        = body        article' <|> body        article
+        , tagList     = tagList     article' <|> tagList     article
+        }
+  DB.update (DB.UpsertArticle slug article'')
+  pure article''
 
 deleteArticle :: Slug -> RealWorld ()
 deleteArticle slug = do
-  mArticle <- DB.update $ DB.DeleteArticle slug
-  case mArticle of
-    Nothing ->
-      throwError
-        $ notFound [ "No article with slug " <> show slug <> " found" ]
-    Just _ ->
-      pure ()
+  _article <- DB.update (DB.DeleteArticle slug)
+                !? articleNotFound
+  pure ()
 
+articleNotFound :: Errors
+articleNotFound =
+  notFound "Requested article doesn't exist."

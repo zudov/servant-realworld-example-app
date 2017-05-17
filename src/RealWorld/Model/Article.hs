@@ -1,4 +1,5 @@
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
+{-# LANGUAGE NoMonomorphismRestriction  #-}
 {-# LANGUAGE OverloadedStrings          #-}
 {-# LANGUAGE TemplateHaskell            #-}
 module RealWorld.Model.Article
@@ -32,11 +33,11 @@ $(deriveSafeCopy 0 'base ''Slug)
 instance FromHttpApiData Slug where
   parseUrlPiece = maybe (Left "This is not a slug") Right . readSlug
 
-sluggify :: Text -> Maybe Slug
+sluggify :: MonadPlus m => Text -> m Slug
 sluggify =
   fmap (Slug . Text.intercalate "-")
     . mfilter (not . null)
-    . Just . slugWords
+    . pure . slugWords
 
 readSlug :: Text -> Maybe Slug
 readSlug t =
@@ -86,12 +87,12 @@ emptyArticle = Article
 
 instance FromJSON Article where
   parseJSON json = do
-    o :: Json.Object <- parseJSON json
+    o <- parseJSON json
     slug           <- pure Field.Undefined
-    title          <- Field.getJson o "title"
-    description    <- Field.getJson o "description"
-    body           <- Field.getJson o "body"
-    tagList        <- Field.getJson o "tagList"
+    title          <- Field.objectKey o "title"
+    description    <- Field.objectKey o "description"
+    body           <- Field.objectKey o "body"
+    tagList        <- Field.objectKey o "tagList"
     createdAt      <- pure Field.Undefined
     updatedAt      <- pure Field.Undefined
     favorited      <- pure Field.Undefined

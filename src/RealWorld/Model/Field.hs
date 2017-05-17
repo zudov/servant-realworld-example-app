@@ -4,8 +4,8 @@ module RealWorld.Model.Field
   , isValue
   , isNil
   , isUndefined
-  , toMaybe
-  , getJson
+  , toValue
+  , objectKey
   ) where
 
 import RealWorld.Prelude
@@ -64,10 +64,9 @@ isUndefined :: Field a -> Bool
 isUndefined Undefined = True
 isUndefined _         = False
 
-toMaybe :: Field a -> Maybe a
-toMaybe (Value a)   = Just a
-toMaybe Nil         = Nothing
-toMaybe Undefined   = Nothing
+toValue :: Alternative m => Field a -> m a
+toValue (Value a) = pure a
+toValue _         = empty
 
-getJson :: Json.FromJSON a => Json.Object -> Text -> Json.Parser (Field a)
-getJson o k = o .:! k .!= Undefined
+objectKey :: Json.FromJSON a => Json.Object -> Text -> Json.Parser (Field a)
+objectKey o k = o .:! k .!= Undefined

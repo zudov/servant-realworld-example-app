@@ -25,9 +25,9 @@ $(deriveSafeCopy 0 'base ''Profile)
 instance FromJSON Profile where
   parseJSON json = do
     o <- parseJSON json
-    username  <- Field.getJson o "username"
-    bio       <- Field.getJson o "bio"
-    image     <- Field.getJson o "image"
+    username  <- Field.objectKey o "username"
+    bio       <- Field.objectKey o "bio"
+    image     <- Field.objectKey o "image"
     following <- pure Field.Undefined
     pure Profile{..}
 
