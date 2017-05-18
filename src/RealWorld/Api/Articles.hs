@@ -1,21 +1,15 @@
-{-# LANGUAGE DuplicateRecordFields #-}
-{-# LANGUAGE OverloadedLabels      #-}
-{-# LANGUAGE OverloadedStrings     #-}
-module RealWorld.Api.Articles
-  ( Api, server ) where
+{-# LANGUAGE OverloadedStrings #-}
+module RealWorld.Api.Articles where
 
-import RealWorld.Prelude
+import RealWorld.Api.Prelude
 
-import Servant
+import Control.Monad.Time (currentTime)
 
-import           Control.Monad.Time      (currentTime)
 import qualified RealWorld.DB            as DB
 import           RealWorld.Model.Article
   (Article(..), ArticleBody(..), ArticlesBody(..), Slug)
 import qualified RealWorld.Model.Article as Article
-import           RealWorld.Model.Field   (Field)
 import qualified RealWorld.Model.Field   as Field
-import           RealWorld.Monad
 
 type Api =
   GetArticles
