@@ -120,7 +120,9 @@ newtype ArticlesBody = ArticlesBody [Article]
 instance ToJSON ArticlesBody where
   toJSON (ArticlesBody articles) =
     Json.object
-      [ "articles" .= articles ]
+      [ "articles"      .= articles
+      , "articlesCount" .= length articles
+      ]
 
 newtype ArticleBody = ArticleBody Article
   deriving (Show, Eq, Ord)
