@@ -58,6 +58,7 @@ library:
   - monad-time
   - acid-state
   - safecopy
+  - cereal
 executables:
   realworld-app-exe:
     main: Main.hs

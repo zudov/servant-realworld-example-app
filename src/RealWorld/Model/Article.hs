@@ -57,16 +57,16 @@ newtype Tag = Tag Text
 $(deriveSafeCopy 0 'base ''Tag)
 
 data Article = Article
-  { slug           :: Field Slug
-  , title          :: Field Text
-  , description    :: Field Text
-  , body           :: Field Text
-  , tagList        :: Field (Vector Tag)
-  , createdAt      :: Field UTCTime
-  , updatedAt      :: Field UTCTime
-  , favorited      :: Field Bool
-  , favoritesCount :: Field Int
-  , author         :: Field Profile
+  { slug           :: Field "slug"           Slug
+  , title          :: Field "title"          Text
+  , description    :: Field "description"    Text
+  , body           :: Field "body"           Text
+  , tagList        :: Field "tagList"        (Vector Tag)
+  , createdAt      :: Field "createdAt"      UTCTime
+  , updatedAt      :: Field "updatedAt"      UTCTime
+  , favorited      :: Field "favorited"      Bool
+  , favoritesCount :: Field "favoritesCount" Int
+  , author         :: Field "author"         Profile
   } deriving (Show, Eq, Ord)
 
 $(deriveSafeCopy 0 'base ''Article)
@@ -89,10 +89,10 @@ instance FromJSON Article where
   parseJSON json = do
     o <- parseJSON json
     slug           <- pure Field.Undefined
-    title          <- Field.objectKey o "title"
-    description    <- Field.objectKey o "description"
-    body           <- Field.objectKey o "body"
-    tagList        <- Field.objectKey o "tagList"
+    title          <- Field.objectKey @"title" o
+    description    <- Field.objectKey @"description" o
+    body           <- Field.objectKey @"body" o
+    tagList        <- Field.objectKey @"tagList" o
     createdAt      <- pure Field.Undefined
     updatedAt      <- pure Field.Undefined
     favorited      <- pure Field.Undefined

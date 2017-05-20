@@ -22,7 +22,6 @@ type Api =
     :<|>
   "tags"     :> Tags.Api
 
-
 server :: ServerT Api RealWorld
 server =
   Authentication.server

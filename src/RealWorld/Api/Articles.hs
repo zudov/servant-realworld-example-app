@@ -9,6 +9,7 @@ import qualified RealWorld.DB            as DB
 import           RealWorld.Model.Article
   (Article(..), ArticleBody(..), ArticlesBody(..), Slug)
 import qualified RealWorld.Model.Article as Article
+import qualified RealWorld.Model.Errors  as Errors
 import qualified RealWorld.Model.Field   as Field
 
 type Api =
@@ -61,13 +62,13 @@ getArticles = do
 
 createArticle :: ArticleBody -> RealWorld ArticleBody
 createArticle (ArticleBody a) = ArticleBody <$> do
-  title_ <- require a "title"       title
-  desc_  <- require a "description" description
-  body_  <- require a "body"        body
-  tags_  <- require a "tagList"     tagList
+  title_ <- Field.require a title
+  desc_  <- Field.require a description
+  body_  <- Field.require a body
+  tags_  <- Field.require a tagList
               <|> pure mempty
   slug_  <- Article.sluggify title_
-              ?? unprocessable "Unsluggable title"
+              ?? Errors.unprocessable "Unsluggable title"
   createdAt_ <- currentTime
 
   let article = Article
@@ -83,14 +84,6 @@ createArticle (ArticleBody a) = ArticleBody <$> do
         , author         = Field.Undefined -- FIXME: DEFINE
         }
   article <$ DB.update (DB.UpsertArticle slug_ article)
-
-require
-  :: (MonadError Errors m, Alternative m)
-  => a -> Text -> (a -> Field b) -> m b
-require a n f =
-  Field.toValue (f a)
-    <|> throwError
-          (unprocessable $ "Field " <> toUrlPiece n <> " is required")
 
 getArticle :: Slug -> RealWorld ArticleBody
 getArticle slug = ArticleBody <$> do
@@ -117,4 +110,4 @@ deleteArticle slug = do
 
 articleNotFound :: Errors
 articleNotFound =
-  notFound "Requested article doesn't exist."
+  Errors.notFound "Requested article doesn't exist."

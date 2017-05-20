@@ -1,5 +1,10 @@
 module RealWorld.Prelude
-  ( module A ) where
+  ( module A
+  , failWith
+  , (??)
+  , failWithM
+  , (!?)
+  ) where
 
 import Prelude as A
 
@@ -30,5 +35,18 @@ import Data.Traversable       as A (for)
 import Data.Vector            as A (Vector)
 import Data.Void              as A (Void)
 import GHC.Generics           as A (Generic)
+import GHC.TypeLits           as A (KnownSymbol, Symbol, symbolVal)
 import Numeric.Natural        as A (Natural)
 import Web.HttpApiData        as A (FromHttpApiData(..), ToHttpApiData(..))
+
+failWith :: MonadError e m => e -> Maybe a -> m a
+failWith e = maybe (throwError e) pure
+
+(??) :: MonadError e m => Maybe a -> e -> m a
+(??) = flip failWith
+
+failWithM :: MonadError e m => e -> m (Maybe a) -> m a
+failWithM e m = m >>= failWith e
+
+(!?) :: MonadError e m => m (Maybe a) -> e -> m a
+(!?) = flip failWithM
