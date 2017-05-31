@@ -59,6 +59,7 @@ library:
   - acid-state
   - safecopy
   - cereal
+  - pwstore-fast
 executables:
   realworld-app-exe:
     main: Main.hs
